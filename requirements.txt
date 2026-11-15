@@ -1,0 +1,6 @@
+flask>=3.0            # web backend (server.py)
+google-genai>=1.0.0     # Gemini (default provider)
+openai>=1.0.0           # only needed with --provider openai
+pydantic>=2.5
+python-dotenv>=1.0
+pypdf>=4.0              # only needed for PDF input

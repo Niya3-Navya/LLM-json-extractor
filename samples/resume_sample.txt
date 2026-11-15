@@ -1,0 +1,19 @@
+Rahul Verma
+rahul.verma@mailbox.com  |  +91-90000-12345  |  Ahmedabad, Gujarat
+
+Data analyst with 4+ years turning messy data into clear dashboards.
+
+WORK HISTORY
+Senior Data Analyst - Finlytics Pvt Ltd - Mar 2023 to present
+ * Built Power BI dashboards used by 200+ staff
+ * Automated weekly reports with Python and SQL
+
+Data Analyst - DataNest Solutions - July 2020 to Feb 2023
+ * Cleaned and modeled sales data in PostgreSQL
+
+EDUCATION
+M.Sc. Statistics, Gujarat University (2020)
+B.Sc. Mathematics, St. Xavier's College, Ahmedabad (2018)
+
+Skills: Python, SQL, Power BI, Excel, PostgreSQL, Pandas
+Certification: Google Data Analytics Certificate

@@ -1,0 +1,20 @@
+Müller & Söhne GmbH
+Hauptstraße 12, 10115 Berlin, Germany
+USt-IdNr. DE123456789
+
+RECHNUNG / INVOICE   Nr. RE-2026-00931
+Datum: 05.11.2026        Zahlbar bis: 05.12.2026
+Kunde / Customer: Lakeside Cafe Ltd
+
+Pos  Beschreibung / Description        Menge   Einzelpreis    Gesamt
+1    Espresso machine EM-200              1     1.249,00     1.249,00
+2    Descaling tablets (pack of 20)       3        12,50        37,50
+3    Service visit (hours)              2,5        85,00       212,50
+
+Zwischensumme / Subtotal            1.499,00 EUR
+Rabatt / Discount (5%)                -74,95 EUR
+Versand / Shipping                     19,90 EUR
+MwSt. / VAT 19%                       274,35 EUR
+GESAMTBETRAG / TOTAL                1.718,30 EUR
+
+Bitte überweisen Sie den Betrag innerhalb von 30 Tagen.

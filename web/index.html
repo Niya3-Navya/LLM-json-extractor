@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLM JSON Extractor</title>
+<style>
+  :root { --bg:#f5f6f8; --card:#fff; --text:#1c1f26; --muted:#6a7080; --line:#dde0e6;
+          --accent:#3558d6; --ok:#17803d; --warn:#b26a00; --err:#b3261e; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--text); }
+  header { padding:20px 24px; background:var(--card); border-bottom:1px solid var(--line); }
+  header h1 { margin:0; font-size:20px; }
+  header p { margin:2px 0 0; color:var(--muted); font-size:14px; }
+  main { display:grid; grid-template-columns:1fr 1fr; gap:20px; padding:20px 24px; max-width:1200px; margin:0 auto; }
+  @media (max-width:850px) { main { grid-template-columns:1fr; } }
+  section { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; }
+  h2 { margin:0 0 12px; font-size:16px; }
+  label { display:block; font-size:13px; color:var(--muted); margin:10px 0 4px; }
+  select, textarea, input[type=file] { width:100%; padding:8px; border:1px solid var(--line); border-radius:6px; font:inherit; background:#fff; }
+  textarea { min-height:260px; font:13px/1.45 ui-monospace,Menlo,Consolas,monospace; resize:vertical; }
+  .row { display:flex; gap:10px; } .row > div { flex:1; }
+  .actions { display:flex; gap:10px; align-items:center; margin-top:14px; flex-wrap:wrap; }
+  button { padding:9px 16px; border:1px solid var(--line); border-radius:6px; background:#fff; font:inherit; cursor:pointer; }
+  button.primary { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600; }
+  button:disabled { opacity:.6; cursor:wait; }
+  #status { margin-bottom:10px; font-weight:600; }
+  .ok { color:var(--ok); } .err { color:var(--err); } .warn { color:var(--warn); }
+  pre { margin:0; padding:12px; background:#0f1420; color:#e6e9f0; border-radius:8px; overflow:auto; max-height:520px; font:13px/1.45 ui-monospace,Menlo,Consolas,monospace; white-space:pre-wrap; word-break:break-word; }
+  ul.warnings { margin:8px 0; padding-left:20px; color:var(--warn); }
+  details { margin-top:10px; font-size:13px; } details pre { max-height:200px; margin-top:6px; }
+  .muted { color:var(--muted); font-size:13px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>LLM JSON Extractor</h1>
+  <p>Turn unstructured invoices and resumes into strictly validated JSON.</p>
+</header>
+
+<main>
+  <section>
+    <h2>1. Input</h2>
+    <div class="row">
+      <div>
+        <label for="docType">Document type</label>
+        <select id="docType"><option value="invoice">Invoice</option><option value="resume">Resume</option></select>
+      </div>
+      <div>
+        <label for="provider">LLM provider</label>
+        <select id="provider"><option value="gemini">Gemini</option><option value="openai">OpenAI</option></select>
+      </div>
+    </div>
+
+    <label for="text">Paste document text</label>
+    <textarea id="text" placeholder="Paste an invoice or resume here, or upload a file below..."></textarea>
+
+    <label for="file">...or upload a .txt / .pdf file (used instead of the text box)</label>
+    <input type="file" id="file" accept=".txt,.pdf">
+
+    <div class="actions">
+      <button class="primary" id="run">Extract JSON</button>
+      <button id="sampleSimple" type="button">Load sample</button>
+      <button id="sampleComplex" type="button">Load complex sample</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>2. Validated result</h2>
+    <div id="status" class="muted">No result yet.</div>
+    <ul id="warnings" class="warnings" hidden></ul>
+    <pre id="output">{}</pre>
+    <div class="actions">
+      <button id="copy" type="button" disabled>Copy JSON</button>
+      <button id="download" type="button" disabled>Download .json</button>
+    </div>
+    <details id="attemptsBox" hidden>
+      <summary>Failed attempts (self-corrected by retry)</summary>
+      <pre id="attempts"></pre>
+    </details>
+  </section>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let lastJson = "";
+
+function setStatus(msg, cls) { const s = $("status"); s.textContent = msg; s.className = cls || "muted"; }
+
+async function loadSample(complex) {
+  const name = $("docType").value + (complex ? "_complex" : "");
+  const res = await fetch("/api/sample/" + name);
+  const body = await res.json();
+  $("text").value = body.text || "";
+  $("file").value = "";
+}
+
+async function run() {
+  const form = new FormData();
+  form.append("doc_type", $("docType").value);
+  form.append("provider", $("provider").value);
+  form.append("text", $("text").value);
+  if ($("file").files[0]) form.append("file", $("file").files[0]);
+
+  $("run").disabled = true;
+  setStatus("Calling the model and validating...", "muted");
+  $("warnings").hidden = true; $("attemptsBox").hidden = true;
+  $("copy").disabled = $("download").disabled = true;
+
+  try {
+    const res = await fetch("/api/extract", { method: "POST", body: form });
+    const body = await res.json();
+    if (!body.success) {
+      setStatus("Error: " + body.error, "err");
+      $("output").textContent = "{}";
+      if (body.failed_attempts && body.failed_attempts.length) showAttempts(body.failed_attempts);
+      return;
+    }
+    lastJson = JSON.stringify(body.data, null, 2);
+    $("output").textContent = lastJson;
+    const retry = body.retries_used ? " after " + body.retries_used + " retry(ies)" : " on the first try";
+    setStatus("Valid JSON" + retry + ".", "ok");
+    $("copy").disabled = $("download").disabled = false;
+    if (body.warnings.length) {
+      const ul = $("warnings"); ul.innerHTML = "";
+      body.warnings.forEach((w) => { const li = document.createElement("li"); li.textContent = w; ul.appendChild(li); });
+      ul.hidden = false;
+    }
+    if (body.failed_attempts.length) showAttempts(body.failed_attempts);
+  } catch (e) {
+    setStatus("Could not reach the server: " + e.message, "err");
+  } finally {
+    $("run").disabled = false;
+  }
+}
+
+function showAttempts(list) { $("attempts").textContent = list.join("\n---\n"); $("attemptsBox").hidden = false; }
+
+$("run").addEventListener("click", run);
+$("sampleSimple").addEventListener("click", () => loadSample(false));
+$("sampleComplex").addEventListener("click", () => loadSample(true));
+$("docType").addEventListener("change", () => { $("text").value = ""; });
+$("copy").addEventListener("click", async () => { await navigator.clipboard.writeText(lastJson); setStatus("Copied to clipboard.", "ok"); });
+$("download").addEventListener("click", () => {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([lastJson], { type: "application/json" }));
+  a.download = $("docType").value + ".json"; a.click();
+});
+</script>
+</body>
+</html>

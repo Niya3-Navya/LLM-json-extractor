@@ -1,0 +1,18 @@
+GreenLeaf Office Supplies Pvt Ltd
+44 MG Road, Bengaluru 560001
+
+TAX INVOICE # GL-2026-0187
+Issued 12/10/2026 (12 October 2026)    Payment due within 15 days: 27 Oct 2026
+
+Billed to: Sunrise Educational Trust
+
+Item                         Qty   Rate      Amount
+A4 Paper Ream (500 sheets)    10   Rs 285.00   Rs 2,850.00
+Ballpoint Pens (box of 50)     4   Rs 150.00   Rs   600.00
+Whiteboard Markers             6   Rs  40.00   Rs   240.00
+
+Sub-total: Rs 3,690.00
+GST @ 18%: Rs 664.20
+Grand Total: Rs 4,354.20
+
+Thank you for your business!

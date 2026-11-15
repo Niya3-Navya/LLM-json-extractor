@@ -1,0 +1,21 @@
+                     ANANYA  IYER
+ ananya.iyer [at] gmail.com  ||  (+91) 98200 55501  ||  Mumbai / remote
+
+~~ PROFILE ~~
+ML engineer, ex-startup. I like shipping NLP features end to end.
+
+~~ CAREER ~~
+2022 - now     |  Lead ML Engineer @ Lingua AI (Series A)
+               |  - led team of 4, deployed LLM-based ticket classifier
+               |  - cut inference cost 40% via batching
+2019 - 2022    |  ML Engineer, Pixelwave
+               |  - recommender systems (PyTorch)
+Summer 2018    |  Research intern - IIT Bombay, NLP lab
+
+~~ STUDIES ~~
+M.Tech (AI), IIT Bombay - graduated 2019
+B.E. Electronics, Mumbai University - '17
+
+~~ TOOLKIT ~~
+python / pytorch / transformers / sql / docker / aws (ec2, s3) / git
+Languages: English, Hindi, Tamil
